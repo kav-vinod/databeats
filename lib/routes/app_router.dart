@@ -1,3 +1,4 @@
+/*
 import 'package:auto_route/auto_route.dart';
 import 'package:databeats/StartPage.dart';
 import 'package:flutter/foundation.dart';
@@ -28,3 +29,4 @@ class AppRouter extends RootStackRouter {
   return DeepLink([]);
   }
 }
+*/

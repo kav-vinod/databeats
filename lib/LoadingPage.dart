@@ -4,9 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'CodeVerifierCubit.dart';
 import 'package:http/http.dart' as http;
 import 'UserHomePage.dart';
-import 'package:auto_route/auto_route.dart';
-import 'package:databeats/routes/app_router.dart';
-@RoutePage()
+import 'package:shared_preferences/shared_preferences.dart';
+
 class LoadingPage extends StatelessWidget {
   final String? authCode;
   final String title;
@@ -72,26 +71,37 @@ class LoadingPage extends StatelessWidget {
 
   }
 
+  Future<String?> getCodeVerifier() async {
+  final prefs = await SharedPreferences.getInstance();
+  return prefs.getString('codeVerifier');
+}
+
+
   @override
   Widget build(BuildContext context) {
     return StatefulWrapper(
       //stateful wrapper takes an onInit function in constructor, which executes a function when widget is initialized, and a child widget to display 
-      onInit: () {
-        final codeVerifier = context.read<CodeVerifierCubit>().state;
+      onInit : () async {
+        //final codeVerifier = context.read<CodeVerifierCubit>().state;
+        final codeVerifier = await getCodeVerifier();
+        final codeVerifierString = codeVerifier.toString();
         //.then() method allows you to specify a callback function that will be executed when the future completes 
         //the value param represents the result of the Future once it completes, if it returns a value
-        
-        passAuthCode(authCode, codeVerifier).then((value) {
+        print("Code Verifier: $codeVerifierString");
+        passAuthCode(authCode, codeVerifierString).then((value) {
           if (value == true) {
             print("Success");
-            context.router.push(UserHomeRoute(title: "Databeats"));
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => UserHomePage(title: 'Databeats')),
+            );
           } else {
             print("Could not get data at this time");
           }
         });
 
         
-        context.read<CodeVerifierCubit>().clear(); 
+        //context.read<CodeVerifierCubit>().clear(); 
       },
       child: Scaffold(
       appBar: AppBar(

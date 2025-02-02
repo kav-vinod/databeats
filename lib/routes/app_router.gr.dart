@@ -8,6 +8,8 @@
 // ignore_for_file: type=lint
 // coverage:ignore-file
 
+/*
+
 part of 'app_router.dart';
 
 /// generated route for
@@ -128,3 +130,5 @@ class UserHomeRouteArgs {
     return 'UserHomeRouteArgs{key: $key, title: $title}';
   }
 }
+
+*/

@@ -3,15 +3,13 @@ import 'package:http/http.dart' as http;
 import 'styles/styles.dart';
 import 'dart:convert';
 import 'classes/RecentSongsCard.dart';
-import 'package:auto_route/auto_route.dart';
 
-@RoutePage()
 class UserHomePage extends StatefulWidget {
   @override
 
   final String title;
 
-  const UserHomePage({super.key, required this.title});
+  const UserHomePage({required this.title});
 
   @override
   State<UserHomePage> createState() => _UserHomePageState();
@@ -31,6 +29,7 @@ class _UserHomePageState extends State<UserHomePage> {
     if (response.statusCode == 200) {
       var jsonResponse = json.decode(response.body);
       //done bc array of tracks accessed by 'items' keyword in dictionary 
+      print(jsonResponse);
       var recentlyPlayed = jsonResponse['items']; 
       for (var item in recentlyPlayed) {
         recentlyPlayedList.add(RecentSongsCard.fromJson(item));

@@ -7,16 +7,15 @@ import 'package:url_launcher/url_launcher.dart';
 import 'styles/styles.dart';
 import 'CodeVerifierCubit.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:auto_route/auto_route.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 
-@RoutePage()
 class StartPage extends StatelessWidget {
-
   @override
 
+  final String title;
 
-  StartPage({super.key});
+  StartPage({required this.title});
 
   Widget build(BuildContext context) {
     String generateRandomString(int length) {
@@ -55,6 +54,13 @@ class StartPage extends StatelessWidget {
     // The Flutter framework has been optimized to make rerunning build methods
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
+        // Listen for deep links
+
+    Future<void> saveCodeVerifier(String codeVerifier) async {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('codeVerifier', codeVerifier);
+    }
+
     return Scaffold(
       appBar: AppBar(
         // TRY THIS: Try changing the color here to a specific color (to
@@ -63,8 +69,9 @@ class StartPage extends StatelessWidget {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
-        title: Text("Databeats"),
+        title: Text(title),
       ),
+      
       body: Container(
         color: Colors.black,
         child: Center(
@@ -95,9 +102,11 @@ class StartPage extends StatelessWidget {
                 onPressed:() async {
                   final codeVerifier = generateRandomString(64);
                   context.read<CodeVerifierCubit>().update(codeVerifier);
+                  await saveCodeVerifier(codeVerifier);
                   final hashed = await hashString(codeVerifier); 
                   final codeChallenge = base64Encode(hashed);
-                  print(codeVerifier);
+                  print("Code Challenge: $codeChallenge");
+                  print("Code Verifier: $codeVerifier");
                   await authenticate(codeChallenge);
 
                 },
@@ -120,7 +129,7 @@ class StartPage extends StatelessWidget {
 Future<void> authenticate(String codeChallenge) async {
   final url = Uri.parse("https://accounts.spotify.com/authorize"); 
   final clientID = "944de3314dac437ebacea5d195f9e0c1";
-  final redirectURI = "databeats-auth://callback";
+  final redirectURI = "http://localhost:54482/callback";
   final scope = "user-read-private%20user-read-email%20user-top-read%20user-read-recently-played";
 
   final Map<String, String> params = {
@@ -136,7 +145,7 @@ Future<void> authenticate(String codeChallenge) async {
   
   // Launch the URL in the browser
   if (await canLaunchUrl(authUrl)) {
-    await launchUrl(authUrl, mode: LaunchMode.externalApplication);
+    await launchUrl(authUrl, mode: LaunchMode.inAppWebView);
   } else {
     throw 'Could not launch $authUrl';
   }
