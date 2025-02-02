@@ -76,7 +76,6 @@ class LoadingPage extends StatelessWidget {
   return prefs.getString('codeVerifier');
 }
 
-
   @override
   Widget build(BuildContext context) {
     return StatefulWrapper(
