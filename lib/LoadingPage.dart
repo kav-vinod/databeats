@@ -1,48 +1,31 @@
 import 'package:flutter/material.dart';
 import 'styles/styles.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'CodeVerifierCubit.dart';
+import 'SimpleCubits.dart';
 import 'package:http/http.dart' as http;
 import 'UserHomePage.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:databeats/routes/app_router.dart';
+import 'dart:convert';
+
 @RoutePage()
 class LoadingPage extends StatelessWidget {
   final String? authCode;
   final String title;
   const LoadingPage({super.key, required this.authCode, required this.title});
 
-//asynch methods return a Future, which is returned immediately and represents a value that will be available at sone point in the future (replaced when asynch option is done)
-  Future<bool> passAuthCode(String? authCode, String? codeVerifier) async {
-    /*
-    final url = Uri.parse("https://accounts.spotify.com/api/token"); 
-    final clientID = "944de3314dac437ebacea5d195f9e0c1";
-    final redirectURI = "databeats-auth://callback";
-    final params = {
-      "client_id": clientID,
-      "redirect_uri": redirectURI,
-      "grant_type": "authorization_code",
-      "code": authCode,
-      "code_verifier": codeVerifier,
-    };
 
-    final headers = {
-      'Content-Type': 'application/x-www-form-urlencoded',
-    };
-    final tokenUrl = url.replace(queryParameters: params);
-    final response = await http.post(tokenUrl, headers: headers);
-    print(response.body);
-    if (response.statusCode == 200){
-      return true; 
-    }
-    else{
-      return false; 
-    }
-    */
+//asynch methods return a Future, which is returned immediately and represents a value that will be available at sone point in the future (replaced when asynch option is done)
+  Future<String> passAuthCode(String? authCode, String? codeVerifier) async {
  
     final response = await http.get(Uri.parse("https://kavithavinod.pythonanywhere.com/get_token/$authCode/$codeVerifier"));
     print(response.body);
-    return true; 
+    //getting profile to initialize account or check if it exists already 
+    var id = await getProfile();
+    if (id != ""){
+      //await initializeAccount(id);
+    }
+    return id; 
     /*
     if (response.statusCode == 200){
       if (getProfile() == true){
@@ -57,10 +40,15 @@ class LoadingPage extends StatelessWidget {
    
   }
 
-  Future<bool> getProfile() async{
+  Future<String> getProfile() async{
     final response = await http.get(Uri.parse("https://kavithavinod.pythonanywhere.com/get_profile"));
-    print(response.body);
-    return true; 
+    if (response.statusCode == 200){
+      var jsonResponse = json.decode(response.body);
+      print(jsonResponse);
+      final id = jsonResponse['id'];
+      return id; 
+    }
+    return ""; 
     /*
     if (response.statusCode == 200){
       return true; 
@@ -72,6 +60,16 @@ class LoadingPage extends StatelessWidget {
 
   }
 
+  Future<void> initializeAccount(String? id) async { 
+    var response = await http.get(Uri.parse("https://kavithavinod.pythonanywhere.com/initialize_account/$id"));
+    if (response.statusCode == 200){
+      print("Successfully initialized account");
+    }
+    else{
+      print("Failed to initialize account");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return StatefulWrapper(
@@ -80,13 +78,12 @@ class LoadingPage extends StatelessWidget {
         final codeVerifier = context.read<CodeVerifierCubit>().state;
         //.then() method allows you to specify a callback function that will be executed when the future completes 
         //the value param represents the result of the Future once it completes, if it returns a value
-        
         passAuthCode(authCode, codeVerifier).then((value) {
-          if (value == true) {
+          if (value != "") {
             print("Success");
-            context.router.push(UserHomeRoute(title: "Databeats"));
+            context.router.push(WrapperRoute(title: "Databeats", id: value));
           } else {
-            print("Could not get data at this time");
+            print("Error 2: Could not get data at this time");
           }
         });
 

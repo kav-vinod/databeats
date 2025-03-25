@@ -20,3 +20,10 @@ const TextStyle subSectionStyleWhite = TextStyle(
   fontSize: 14, 
   color: Colors.white,
 ); 
+
+const textPaddingTitle = 16.0; 
+
+final songCardColor = Colors.grey[900]; 
+
+final friendButtonColor = Colors.grey[900]; 
+

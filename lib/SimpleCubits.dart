@@ -7,3 +7,12 @@ class CodeVerifierCubit extends Cubit<String?> {
 
   void clear() => emit(null); 
 }
+
+class UsernameCubit extends Cubit<String?> {
+  UsernameCubit(String? initial) : super(initial);
+
+  void update(newUsername) => emit(newUsername); 
+
+  void clear() => emit(null); 
+}
+

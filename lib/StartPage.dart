@@ -5,7 +5,7 @@ import 'package:crypto/crypto.dart'; // For sha256
 import 'dart:typed_data';
 import 'package:url_launcher/url_launcher.dart';
 import 'styles/styles.dart';
-import 'CodeVerifierCubit.dart';
+import 'SimpleCubits.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:auto_route/auto_route.dart';
 

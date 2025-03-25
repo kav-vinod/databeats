@@ -3,6 +3,12 @@ import 'package:databeats/StartPage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:databeats/LoadingPage.dart';
 import 'package:databeats/UserHomePage.dart';
+import 'package:databeats/WrapperPage.dart';
+import 'package:databeats/DataPage.dart';
+import 'package:databeats/FriendsPage.dart';
+import 'package:databeats/FriendRequestsPage.dart';
+import 'package:databeats/FriendsWrapperPage.dart';
+import 'package:databeats/FriendComparePage.dart';
 part 'app_router.gr.dart';
 
 @AutoRouterConfig()
@@ -12,7 +18,25 @@ class AppRouter extends RootStackRouter {
   List<AutoRoute> get routes => [
     AutoRoute(page: StartRoute.page, path: '/', initial: true),
     AutoRoute(page: LoadingRoute.page, path: '/loading'),
-    AutoRoute(page: UserHomeRoute.page, path: '/userhome'),
+    //AutoRoute(page: UserHomeRoute.page, path: '/userhome'),
+    //AutoRoute(page: FriendRequestsRoute.page, path: '/friendrequests'),
+    AutoRoute(
+      page: WrapperRoute.page,
+      path: '/wrapper', 
+      children: [
+        AutoRoute(page: UserHomeRoute.page, path: 'userhome'),
+        AutoRoute(page: DataRoute.page, path: 'data'),
+        AutoRoute(
+          page: FriendsWrapperRoute.page, 
+          path: 'friends',
+          children: [
+            AutoRoute(page: FriendsRoute.page, path: 'friends', initial: true),
+            AutoRoute(page: FriendRequestsRoute.page, path: 'friendrequests'),
+            AutoRoute(page: FriendCompareRoute.page, path: 'friendcompare'),
+          ]
+        ),
+      ]
+      ),
   ];
 
   //auto_route registers itself as the deep link handler with the app

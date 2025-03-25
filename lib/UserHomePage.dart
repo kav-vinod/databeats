@@ -4,6 +4,8 @@ import 'styles/styles.dart';
 import 'dart:convert';
 import 'classes/RecentSongsCard.dart';
 import 'package:auto_route/auto_route.dart';
+import 'SimpleCubits.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 @RoutePage()
 class UserHomePage extends StatefulWidget {
@@ -19,14 +21,17 @@ class UserHomePage extends StatefulWidget {
 
 class _UserHomePageState extends State<UserHomePage> {
 
-  var recentlyPlayedList = <RecentSongsCard>[]; 
+  var recentlyPlayed = <RecentSongsCard>[]; 
 
-  Future<List<RecentSongsCard>> getRecentlyPlayed() async {
+  Future<List<RecentSongsCard>> getRecentlyPlayed(BuildContext context) async {
     print("Getting recently played");
-    final url = Uri.parse("https://kavithavinod.pythonanywhere.com/get_recently_played");
+    var id = context.read<UsernameCubit>().state;
+    id = id.toString();
+    final url = Uri.parse("https://kavithavinod.pythonanywhere.com/get_recently_played/$id");
     final response = await http.get(url);
 
     var recentlyPlayedList = <RecentSongsCard>[]; 
+    
 
     if (response.statusCode == 200) {
       var jsonResponse = json.decode(response.body);
@@ -36,9 +41,28 @@ class _UserHomePageState extends State<UserHomePage> {
         recentlyPlayedList.add(RecentSongsCard.fromJson(item));
       }
     } else {
-      throw Exception("Failed to load recently played");
+      throw Exception("Error 3:Failed to load recently played");
     }
     return recentlyPlayedList;
+  }
+
+  Future<void> writeRecenttoDB(BuildContext context) async {
+    var id = context.read<UsernameCubit>().state;
+    id = id.toString();
+    if (id is String){
+      print("ID is a string");
+    }
+    print("Type of id: ${id.runtimeType}");
+    print(id);
+    final url = Uri.parse("https://kavithavinod.pythonanywhere.com/update_recent_songs/$id");
+    final response = await http.get(url);
+    print(response.body);
+    if (response.statusCode == 200){
+      print("Successfully wrote to DB");
+    }
+    else{
+      print("Failed to write to DB");
+    }
   }
   
   @override
@@ -49,12 +73,13 @@ class _UserHomePageState extends State<UserHomePage> {
     //State object lives in memory as part of the widget's lifecycle; maintained across rebuilds 
     //2. State object created -> initState method called. setState is called to set state of widget here within initState, as we want the list of recently played songs to be set before the widget is inserted into the widget tree
     //3. InitState done -> build method called. Widget tree constructed based on current state of widget (widget inserted into tree)
-    //4. if any updates need to be made, call setState again (outside of initState), and initState is called only upon creation of a widget
-    getRecentlyPlayed().then((value) => 
+    //4. if any updates need to be made, call setState again (outside of initState), as initState is called only upon creation of a widget
+    getRecentlyPlayed(context).then((value) => 
       //call setState, which takes in a function that sets recentlyPlayedList to the value returned by getRecentlyPlayed
       //calling setState notifies framework that the state of the object has changed in order to trigger a rebuild
       setState(() => 
-        recentlyPlayedList = value));
+        recentlyPlayed = value));
+      //writeRecenttoDB(context);
     super.initState(); 
   }
   
@@ -87,29 +112,29 @@ class _UserHomePageState extends State<UserHomePage> {
                     return Padding(
                       padding: EdgeInsets.all(8.0),
                       child: Container (
-                      decoration: BoxDecoration(
+                        decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10.0),
                         border: Border.all(color: Colors.white),
                       ),
-                      child: Card(
-                      color: Colors.black,
-                      child: Padding (
-                        padding: const EdgeInsets.only(top: 20.0, bottom: 20.0, left: 18.0, right: 18.0),
-                          child: Column(
-                            children: <Widget>[
-                              Text(recentlyPlayedList[index].name, textAlign: TextAlign.center, style: defaultStyleWhite),
-                              Text("Artist(s): ${recentlyPlayedList[index].artists.join(", ")}", textAlign: TextAlign.center, style: subSectionStyleWhite),
-                              Text("Album: ${recentlyPlayedList[index].album}", textAlign: TextAlign.center, style: subSectionStyleWhite),
-                            ],
-                          ),
+                        child: Card(
+                          color: songCardColor,
+                          child: Padding (
+                            padding: const EdgeInsets.only(top: 20.0, bottom: 20.0, left: 18.0, right: 18.0),
+                              child: Column(
+                                children: <Widget>[
+                                  Text(recentlyPlayed[index].name, textAlign: TextAlign.center, style: defaultStyleWhite),
+                                  Text("Artist(s): ${recentlyPlayed[index].artists.join(", ")}", textAlign: TextAlign.center, style: subSectionStyleWhite),
+                                  Text("Album: ${recentlyPlayed[index].album}", textAlign: TextAlign.center, style: subSectionStyleWhite),
+                                ],
+                              ),
+                            )
                         )
-                      )
                     ) 
                   );
                   },
                   //itemCount is the number of items in the list, and is the # of times itemBuilder is called
                   //if not specified, index will increment and if list whose vals index is used to access inside is <= than index, you'll get an out of bounds error
-                  itemCount: recentlyPlayedList.length,
+                  itemCount: recentlyPlayed.length,
               )
             )
           ]

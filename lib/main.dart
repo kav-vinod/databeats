@@ -3,18 +3,12 @@ import 'package:flutter/material.dart';
 import 'StartPage.dart';
 import 'LoadingPage.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'CodeVerifierCubit.dart';
+import 'SimpleCubits.dart';
 import 'routes/app_router.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'CodeVerifierCubit.dart';
-import 'routes/app_router.dart';
-import 'package:uni_links/uni_links.dart';
-
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'CodeVerifierCubit.dart';
+import 'SimpleCubits.dart';
 import 'routes/app_router.dart';
 import 'package:uni_links/uni_links.dart';
 
@@ -91,7 +85,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       routerConfig: _appRouter.config(),
       title: 'Databeats',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.purple.shade50),
         useMaterial3: true,
       ),
     );
