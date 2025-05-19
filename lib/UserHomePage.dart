@@ -6,6 +6,8 @@ import 'classes/RecentSongsCard.dart';
 import 'package:auto_route/auto_route.dart';
 import 'SimpleCubits.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'widgets/FriendsPagesCard.dart';
+import 'UserBlocs.dart';
 
 @RoutePage()
 class UserHomePage extends StatefulWidget {
@@ -40,6 +42,10 @@ class _UserHomePageState extends State<UserHomePage> {
       for (var item in recentlyPlayed) {
         recentlyPlayedList.add(RecentSongsCard.fromJson(item));
       }
+      //context.read<UserRecentSongsBloc>()> looks at the context it has been provided (from the widget tree) to find the instance of UserRecentSongsBloc it should interact with
+      //then it calls the add method on that instance, passing in a FillRecentSongs event with recentlyPlayedList as the argument
+      //this event is handled by the UserRecentSongsBloc, which updates the state of the bloc by emitting a new list of recent songs
+      context.read<UserRecentSongsBloc>().add(FillRecentSongs(recentlyPlayedList)); 
     } else {
       throw Exception("Error 3:Failed to load recently played");
     }
@@ -109,28 +115,9 @@ class _UserHomePageState extends State<UserHomePage> {
               child: ListView.builder(
                 //item builder is an instance of a function NullableIndexedWidgetBuilder, which takes in a context and an index (like index of a list), and returns a widget for that index in the list
                   itemBuilder: (context, index) {
-                    return Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Container (
-                        decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10.0),
-                        border: Border.all(color: Colors.white),
-                      ),
-                        child: Card(
-                          color: songCardColor,
-                          child: Padding (
-                            padding: const EdgeInsets.only(top: 20.0, bottom: 20.0, left: 18.0, right: 18.0),
-                              child: Column(
-                                children: <Widget>[
-                                  Text(recentlyPlayed[index].name, textAlign: TextAlign.center, style: defaultStyleWhite),
-                                  Text("Artist(s): ${recentlyPlayed[index].artists.join(", ")}", textAlign: TextAlign.center, style: subSectionStyleWhite),
-                                  Text("Album: ${recentlyPlayed[index].album}", textAlign: TextAlign.center, style: subSectionStyleWhite),
-                                ],
-                              ),
-                            )
-                        )
-                    ) 
-                  );
+                    return FriendsPagesCard(text: (index + 1).toString() + ". " + recentlyPlayed[index].name, icon: Icon(Icons.arrow_forward_ios_rounded), onPressed: () {
+                      print("Pressed");
+                    });
                   },
                   //itemCount is the number of items in the list, and is the # of times itemBuilder is called
                   //if not specified, index will increment and if list whose vals index is used to access inside is <= than index, you'll get an out of bounds error

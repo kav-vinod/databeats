@@ -25,5 +25,9 @@ const textPaddingTitle = 16.0;
 
 final songCardColor = Colors.grey[900]; 
 
+final userHomePageCardColor = Colors.black; 
+
 final friendButtonColor = Colors.grey[900]; 
+
+final borderRadius = 10.0; 
 

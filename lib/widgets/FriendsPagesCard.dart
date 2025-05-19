@@ -23,7 +23,13 @@ class FriendsPagesCard extends StatelessWidget {
         padding: EdgeInsets.only(top: 16.0, bottom: 16.0, left: 12.0, right: 12.0),
         child: Row(
           children: [
-            Text(text, style: titleStyleWhite),
+            Expanded( // Wrap text in Expanded
+                child: Text(
+                  text, 
+                  style: titleStyleWhite,
+                  overflow: TextOverflow.ellipsis, // Add ellipsis for overflow
+                ),
+              ),
             icon != null && onPressed != null ?
             IconButton(onPressed: () {
               onPressed?.call();

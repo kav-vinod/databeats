@@ -3,6 +3,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:databeats/routes/app_router.dart';
 import 'SimpleCubits.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:databeats/UserBlocs.dart';
 
 @RoutePage()
 class WrapperPage extends StatelessWidget implements AutoRouteWrapper { 
@@ -12,8 +13,15 @@ class WrapperPage extends StatelessWidget implements AutoRouteWrapper {
 
   @override
   Widget wrappedRoute(BuildContext context) {
-    return BlocProvider(
-      create: (context) => UsernameCubit(id),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<UsernameCubit>(
+          create: (context) => UsernameCubit(id),
+        ),
+         BlocProvider<UserRecentSongsBloc>(
+          create: (context) => UserRecentSongsBloc([]),
+        ),
+      ],
       child: this,
     );
   }
@@ -22,7 +30,7 @@ class WrapperPage extends StatelessWidget implements AutoRouteWrapper {
   Widget build(BuildContext context) {
     return AutoTabsScaffold(
       routes: [
-        UserHomeRoute(title: title),
+        RecentFavsWrapperRoute(title: title),
         DataRoute(title: title),
         FriendsWrapperRoute(title: title),
       ],

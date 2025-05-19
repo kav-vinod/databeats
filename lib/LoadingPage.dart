@@ -81,7 +81,20 @@ class LoadingPage extends StatelessWidget {
         passAuthCode(authCode, codeVerifier).then((value) {
           if (value != "") {
             print("Success");
-            context.router.push(WrapperRoute(title: "Databeats", id: value));
+            context.router.push(
+              WrapperRoute(
+                title: "Databeats",
+                id: value,
+                children: [
+                  RecentFavsWrapperRoute(
+                    title: "Databeats",
+                    children: [
+                      UserHomeRoute(title: "Databeats"), // ✅ PASS ARGUMENT HERE
+                    ],
+                  ),
+                ],
+              ),
+            );
           } else {
             print("Error 2: Could not get data at this time");
           }

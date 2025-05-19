@@ -239,6 +239,45 @@ class LoadingRouteArgs {
 }
 
 /// generated route for
+/// [RecentFavsWrapperPage]
+class RecentFavsWrapperRoute extends PageRouteInfo<RecentFavsWrapperRouteArgs> {
+  RecentFavsWrapperRoute({
+    Key? key,
+    required String title,
+    List<PageRouteInfo>? children,
+  }) : super(
+         RecentFavsWrapperRoute.name,
+         args: RecentFavsWrapperRouteArgs(key: key, title: title),
+         initialChildren: children,
+       );
+
+  static const String name = 'RecentFavsWrapperRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      final args = data.argsAs<RecentFavsWrapperRouteArgs>();
+      return WrappedRoute(
+        child: RecentFavsWrapperPage(key: args.key, title: args.title),
+      );
+    },
+  );
+}
+
+class RecentFavsWrapperRouteArgs {
+  const RecentFavsWrapperRouteArgs({this.key, required this.title});
+
+  final Key? key;
+
+  final String title;
+
+  @override
+  String toString() {
+    return 'RecentFavsWrapperRouteArgs{key: $key, title: $title}';
+  }
+}
+
+/// generated route for
 /// [StartPage]
 class StartRoute extends PageRouteInfo<StartRouteArgs> {
   StartRoute({Key? key, List<PageRouteInfo>? children})

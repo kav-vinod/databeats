@@ -4,6 +4,7 @@ sealed class FriendActions {}
 
 final class AddFriend extends FriendActions{
   final String friendAdded; 
+  //event in the Bloc represents an action (instance of the class) and event.friendAdded = friendAdded here
   AddFriend(this.friendAdded); 
 }
 

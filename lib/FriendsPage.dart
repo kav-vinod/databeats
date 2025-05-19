@@ -24,14 +24,17 @@ class _FriendsPageState extends State<FriendsPage> {
   var friendRequestsList = <String>[]; 
   var loaded = false; 
   var usersList = <String>[]; 
+  var token = 1; 
 
   late final FriendsListBloc friendsListBloc; // Declare without initialization bc can't initialize Bloc w/ instance vars (ie friend list) w/o initState
   late final FriendsRequestBloc friendRequestsBloc; 
+  var selectedSearch = null; 
 
   Future<Map<String, dynamic>> getFriends(BuildContext context) async {
     var username = context.read<UsernameCubit>().state; 
-    var response = await http.get(Uri.parse("https://kavithavinod.pythonanywhere.com/get_friends/$username"));
+    var response = await http.get(Uri.parse("https://kavithavinod.pythonanywhere.com/get_friends/$username/$token"));
     var friendsInfoJson = <String, dynamic>{}; 
+    print("hi");
     print(response.body);
     if (response.statusCode == 200) {
       friendsInfoJson = json.decode(response.body); 
@@ -40,7 +43,6 @@ class _FriendsPageState extends State<FriendsPage> {
   }
 
   Future<List<String>> getUsers(BuildContext context) async {
-    var token = 1; 
     var response = await http.get(Uri.parse("https://kavithavinod.pythonanywhere.com/get_all_users/$token"));
     var usersJson = <dynamic>[]; 
     if (response.statusCode == 200) {
@@ -50,11 +52,22 @@ class _FriendsPageState extends State<FriendsPage> {
     return usersList; 
   }
 
+  Future<void> addPendingFriend(BuildContext context, selectedSearch) async {
+    var username = context.read<UsernameCubit>().state; 
+    print(selectedSearch);
+    var response = await http.post(Uri.parse("https://kavithavinod.pythonanywhere.com/add_pending_friend/$username/$selectedSearch/$token"));
+    print(response.body);
+    if (response.statusCode == 200) {
+      print("Friend request sent");
+    }
+  }
+
   @override
   void initState()  { 
     super.initState();
     friendsListBloc = BlocProvider.of<FriendsListBloc>(context);
     friendRequestsBloc = BlocProvider.of<FriendsRequestBloc>(context); 
+
     getFriends(context).then(
       (value) => setState(
         //initially widget will build with friendsList being empty
@@ -91,21 +104,29 @@ class _FriendsPageState extends State<FriendsPage> {
             color: Colors.black,
             child: Column(
               children: [
-                Padding(padding: EdgeInsets.all(textPaddingTitle),
-                  child: SearchAnchor.bar(
+                Padding(padding: EdgeInsets.only(top: textPaddingTitle, bottom: textPaddingTitle, left: 12.0, right: 12.0),
+                  child: Theme(
+                    data: Theme.of(context).copyWith(
+                      //simple way to change the color of the search bar icons w/o overriding any functionality 
+                       iconTheme: IconThemeData(color: Colors.grey[200]),  
+                    ),
+                    child: SearchAnchor.bar(
                     //Widget state property defines how a property (like color) should behave under certain states 
                     //If you wanted to, can change the background color of the search bar based on different states (like when it is pressed)
                     //barBackgroundColor expects a widget state property, which is why you can't set its value to a color directly 
-                    barBackgroundColor: WidgetStateProperty.all(Colors.grey[900]), // Background color
+                    barBackgroundColor: WidgetStateProperty.all(Colors.grey.shade900), // Background color
                     barHintText: "Search friends by Spotify username", // Padding inside bar
-                    barHintStyle: WidgetStateProperty.all(TextStyle(color: Colors.white)),
+                    barHintStyle: WidgetStateProperty.all(TextStyle(color: Colors.grey[200])),
+                    barTextStyle: WidgetStateProperty.all(TextStyle(color: Colors.grey[200])),
                     barShape: WidgetStateProperty.all(RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10), // Rounded border
                       side: BorderSide(color: Colors.purple.shade50, width: 1), // White border
                     )),
-                    barLeading: const Icon(Icons.search, color: Colors.white),
                     viewBackgroundColor: Colors.grey[900],
                     viewHeaderTextStyle: TextStyle(color: Colors.grey[200]),
+                    viewHeaderHintStyle: TextStyle(color: Colors.grey[200]),
+                    
+                    //viewTrailing: [Icon(Icons.close, color: Colors.white)],
                     suggestionsBuilder: 
                     (BuildContext context, SearchController controller) {
                       final String input = controller.value.text; 
@@ -116,6 +137,9 @@ class _FriendsPageState extends State<FriendsPage> {
                             title: Text(user, style: TextStyle(color: Colors.white)),
                             onTap: () {
                               controller.closeView(user); 
+                              setState(() {
+                                selectedSearch = user; 
+                              }); 
                             },
                             hoverColor: Colors.purple.shade50,
                             tileColor: Colors.grey[900],
@@ -123,8 +147,39 @@ class _FriendsPageState extends State<FriendsPage> {
                         )
                         .toList(); 
                     },
-                  ), 
+                  ),
+                  ),
                 ),
+                selectedSearch != null ? Column (
+                children: [
+                  Padding(padding: EdgeInsets.only(top: 4.0, bottom: 4.0, left: 8.0, right: 8.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.grey[900],
+                      borderRadius: BorderRadius.circular(10.0)
+                    ),
+                    child: Padding(padding: EdgeInsets.only(top: 16.0, bottom: 16.0, left: 12.0, right: 12.0),
+                      child: Row(
+                        children: [
+                          Text("Add ${selectedSearch} to friends?", style: titleStyleWhite),
+                          IconButton(onPressed: () async {
+                            await addPendingFriend(context, selectedSearch);
+                            setState(() {
+                              selectedSearch = null; 
+                            }); 
+                          }, icon: Icon(Icons.add, color: Colors.green), color: Colors.white),
+                          IconButton(onPressed: () {
+                            setState(() {
+                              selectedSearch = null; 
+                            }); 
+                          }, icon: Icon(Icons.close, color: Colors.red))
+                        ],
+                      )
+                    )
+                  )
+                  )
+                ],
+              ) :
                 BlocBuilder<FriendsRequestBloc, List<String>> (
                   builder: (context, state) {
                     return (state.isNotEmpty) ?

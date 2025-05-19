@@ -9,6 +9,7 @@ import 'package:databeats/FriendsPage.dart';
 import 'package:databeats/FriendRequestsPage.dart';
 import 'package:databeats/FriendsWrapperPage.dart';
 import 'package:databeats/FriendComparePage.dart';
+import 'package:databeats/RecentFavsWrapperPage.dart';
 part 'app_router.gr.dart';
 
 @AutoRouterConfig()
@@ -24,7 +25,13 @@ class AppRouter extends RootStackRouter {
       page: WrapperRoute.page,
       path: '/wrapper', 
       children: [
-        AutoRoute(page: UserHomeRoute.page, path: 'userhome'),
+        AutoRoute(
+          page: RecentFavsWrapperRoute.page, 
+          path: 'recentfavs',
+          children: [
+            AutoRoute(page: UserHomeRoute.page, path: 'userhome', initial: true),
+          ]
+        ),
         AutoRoute(page: DataRoute.page, path: 'data'),
         AutoRoute(
           page: FriendsWrapperRoute.page, 
